@@ -7,7 +7,7 @@ const generateToken = require('../utils/jwtUtils');
 
 const { authenticateUser } = require('../middlewares/authentication');
 
-router.post('/', async (req, res, next) => {
+router.post('/register', async (req, res, next) => {
   const [err, user] = await asyncWrapper(UsersController.createUser(req.body));
   if (err) {
     return next(err);

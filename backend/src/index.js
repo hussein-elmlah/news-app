@@ -2,7 +2,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const userRoutes = require('./routes/userRoutes');
-const CustomError = require('./lib/customError');
+const errorHandler = require('./middlewares/errorHandler');
 
 const { PORT, MONGODB_URI } = require('./config');
 
@@ -26,14 +26,7 @@ app.use('*', (req, res) => {
   res.status(404).send('Not found');
 });
 
-app.use((err, req, res, next) => {
-  // If the error is a CustomError or has a status property, send the appropriate status code and message
-  if (err instanceof CustomError || err.status) {
-    res.status(err.status || 500).json({ error: err.message });
-  } else {
-    res.status(500).json({ error: 'Internal Server Error' });
-  }
-});
+app.use(errorHandler);
 
 process.on('uncaughtException', (err) => {
   console.log('Uncaught exception occurred:\n', err);

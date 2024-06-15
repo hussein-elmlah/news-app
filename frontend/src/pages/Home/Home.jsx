@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
-const NewsPage = () => {
+const Home = () => {
   const [news, setNews] = useState([]);
 
   useEffect(() => {
@@ -27,7 +27,7 @@ const NewsPage = () => {
 
   return (
     <div className="container mt-5">
-      <h2>News</h2>
+      <h2>Home page</h2>
       <div className="row" id="newsSection">
         {news.map((newsItem) => (
           <div key={newsItem.id} className="col-md-3 col-sm-6 overflow-hidden">
@@ -62,4 +62,4 @@ const NewsPage = () => {
   );
 };
 
-export default NewsPage;
+export default Home;

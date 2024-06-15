@@ -11,7 +11,6 @@ const userSchema = new mongoose.Schema(
       unique: true,
       validate: {
         validator(v) {
-          // Regular expression for validating an Email
           return /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/.test(v);
         },
         message: 'The email you entered is not a valid email address!',
@@ -27,13 +26,9 @@ const userSchema = new mongoose.Schema(
   { timestamps: true, runValidators: true },
 );
 
-// Define a toJSON method to control the JSON output when converting Mongoose documents to JSON
 userSchema.set('toJSON', {
-  // The transform function allows you to modify the JSON representation of the document
   transform(doc, ret) {
-    // Rename the '_id' field to 'id' for better readability
     ret.id = ret._id;
-    // Remove the '_id' and '__v' fields from the JSON output
     delete ret._id;
     delete ret.__v;
     // Remove the 'password' field from the JSON output for security reasons

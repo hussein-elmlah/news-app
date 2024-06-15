@@ -6,9 +6,8 @@ import Register from "./pages/Register/Register";
 import Navbar from "./components/navbar/Navbar";
 import Footer from "./components/footer/Footer";
 import NotFoundPage from "./pages/NotFoundPage/NotFoundPage";
-import NewsPage from "./pages/NewsPage/NewsPage";
-
-
+import Home from "./pages/Home/Home";
+import ResourcesPage from "./pages/ResourcesPage/ResourcesPage";
 
 function UserLayout() {
 
@@ -28,8 +27,13 @@ const router = createBrowserRouter([
     children: [
       {
         path: "/",
-        element: <NewsPage />
-      },      {
+        element: <Home />
+      },  
+      {
+        path: "/resources",
+        element: <ResourcesPage />
+      },      
+      {
         path: "/login",
         element: <Login />
       },

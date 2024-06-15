@@ -28,15 +28,18 @@ const Navbar = () => {
             <li className="nav-item">
               <a className="nav-link" href="/">Home</a>
             </li>
+            <li className="nav-item">
+              <a className="nav-link" href="/resources">Resources</a>
+            </li>
           </ul>
           <ul className="navbar-nav">
             {!isLoggedIn && (
               <>
                 <li className="nav-item">
-                  <a className="nav-link" href="login">Login</a>
+                  <a className="nav-link" href="/login">Login</a>
                 </li>
                 <li className="nav-item">
-                  <a className="nav-link" href="register">Register</a>
+                  <a className="nav-link" href="/register">Register</a>
                 </li>
               </>
             )}

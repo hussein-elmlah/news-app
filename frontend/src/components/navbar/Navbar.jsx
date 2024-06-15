@@ -1,7 +1,21 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { userLogout } from '../../axios/userAuth';
 
 const Navbar = () => {
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    setIsLoggedIn(!!token);
+  }, []);
+
+  const handleLogout = (e) => {
+    e.preventDefault();
+    userLogout().then(() => {
+      setIsLoggedIn(false);
+    });
+  };
+
   return (
     <nav className="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
       <div className="container">
@@ -16,15 +30,21 @@ const Navbar = () => {
             </li>
           </ul>
           <ul className="navbar-nav">
-            <li className="nav-item">
-              <a className="nav-link" href="login">Login</a>
-            </li>
-            <li className="nav-item">
-              <a className="nav-link" href="register">Register</a>
-            </li>
-            <li className="nav-item">
-              <a className="nav-link" onClick={userLogout} href='/'>Logout</a>
-            </li>
+            {!isLoggedIn && (
+              <>
+                <li className="nav-item">
+                  <a className="nav-link" href="login">Login</a>
+                </li>
+                <li className="nav-item">
+                  <a className="nav-link" href="register">Register</a>
+                </li>
+              </>
+            )}
+            {isLoggedIn && (
+              <li className="nav-item">
+                <a className="nav-link" onClick={handleLogout} href='/'>Logout</a>
+              </li>
+            )}
           </ul>
         </div>
       </div>

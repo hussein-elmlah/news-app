@@ -1,23 +1,28 @@
-import axiosInstance from './config';
+import axiosInstance from "./config";
 
 export const userLogin = (values) => {
-  return axiosInstance.post('/users/login', values)
-    .then(response => {
-      if (response.data.token) {
-        console.log('token', response.data.token);
-        localStorage.setItem('token', response.data.token);
-      }
-      return response.data;
-    });
+  return axiosInstance.post("/users/login", values).then((response) => {
+    const token = response.data;
+
+    if (token) {
+      localStorage.setItem("token", token);
+    }
+    return token;
+  });
 };
 
-export const userLogout = () => {
-  console.log('User logged out')
-  localStorage.removeItem('token');
-  return axiosInstance.post('/users/logout');
+export const userLogout = (e) => {
+  return axiosInstance.post("/users/logout")
+    .then((response) => {
+      localStorage.removeItem("token");
+      window.location.href = "/";
+    })
+    .catch((error) => {
+      console.error("Logout failed:", error);
+    });
 };
 
 export const userRegister = (values) => {
   // console.log(values);
-  return axiosInstance.post('/users/register', values);
+  return axiosInstance.post("/users/register", values);
 };

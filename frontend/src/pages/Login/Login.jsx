@@ -34,14 +34,14 @@ const Login = () => {
     });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     const validationErrors = validate(formValues);
     setErrors(validationErrors);
 
     if (Object.keys(validationErrors).length === 0) {
       setIsSubmitting(true);
-      userLogin(formValues)
+      await userLogin(formValues)
         .then((response) => {
           console.log('Login successful:', response);
           window.location.href = '/';

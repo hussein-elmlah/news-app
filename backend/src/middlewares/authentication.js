@@ -20,8 +20,10 @@ const authenticateUser = async (req, res, next) => {
 
     const tokenRevoked = await isTokenRevoked(token);
     if (tokenRevoked) {
+      // console.log('Token revoked trying to access ', token);
       return res.status(403).json({ error: 'Forbidden: Token revoked' });
     }
+    // console.log('Token is not revoked');
 
     if (!user) {
       return res.status(401).json({ error: "Token's user not found" });

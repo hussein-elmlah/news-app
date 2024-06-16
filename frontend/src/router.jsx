@@ -8,6 +8,7 @@ import Footer from "./components/footer/Footer";
 import NotFoundPage from "./pages/NotFoundPage/NotFoundPage";
 import Home from "./pages/Home/Home";
 import SourcesPage from "./pages/SourcesPage/SourcesPage";
+import LoginHistory from "./pages/LoginHistory/LoginHistory";
 
 function UserLayout() {
 
@@ -32,7 +33,11 @@ const router = createBrowserRouter([
       {
         path: "/resources",
         element: <SourcesPage />
-      },      
+      },   
+      {
+        path: "/history",
+        element: <LoginHistory />
+      },    
       {
         path: "/login",
         element: <Login />

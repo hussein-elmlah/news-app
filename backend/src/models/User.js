@@ -2,6 +2,13 @@ const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
 const CustomError = require('../lib/customError');
 
+const loginHistorySchema = new mongoose.Schema({
+  success: { type: Boolean, required: true },
+  timestamp: { type: Date, required: true },
+  ip: { type: String },
+  userAgent: { type: String },
+});
+
 const userSchema = new mongoose.Schema(
   {
     fullName: { type: String, required: true, minlength: 8 },
@@ -18,10 +25,7 @@ const userSchema = new mongoose.Schema(
     },
     password: { type: String, required: true, minlength: 8 },
     subscriptions: { type: [String], default: [] },
-    loginHistory: {
-      type: [{ success: Boolean, timestamp: Date }],
-      default: [],
-    },
+    loginHistory: [loginHistorySchema],
   },
   { timestamps: true, runValidators: true },
 );

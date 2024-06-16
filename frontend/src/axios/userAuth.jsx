@@ -26,3 +26,7 @@ export const userRegister = (values) => {
   // console.log(values);
   return axiosInstance.post("/users/register", values);
 };
+
+export const getLoginHistory = () => {
+  return axiosInstance.get('/users/history');
+};

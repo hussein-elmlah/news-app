@@ -18,14 +18,22 @@ router.post('/register', async (req, res, next) => {
 });
 
 router.post('/login', async (req, res, next) => {
-  const { body: { email, password } } = req;
   const [err, user] = await asyncWrapper(
-    UsersController.loginUser({ email, password }),
+    UsersController.loginUser({ req }),
   );
   if (err) {
     return next(err);
   }
   res.json(user);
+});
+
+router.get('/history', authenticateUser, async (req, res, next) => {
+  const userId = req.user._id;
+  const [err, loginHistory] = await asyncWrapper(UsersController.getLoginHistory(userId));
+  if (err) {
+    return next(err);
+  }
+  res.json(loginHistory);
 });
 
 router.post('/logout', authenticateUser, async (req, res, next) => {

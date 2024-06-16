@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { userLogin } from '../../axios/userAuth';
+import { userLogin } from '../../axios/user';
 
 const Login = () => {
   const [formValues, setFormValues] = useState({

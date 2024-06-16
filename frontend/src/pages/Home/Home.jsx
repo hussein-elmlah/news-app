@@ -1,69 +1,58 @@
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import React, { useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { fetchSubscribedArticles, selectSubscribedArticles, selectTotalResults } from '../../store/slices/articleSlice';
+import ArticleCard from '../../components/ArticleCard/ArticleCard';
+import Spinner from 'react-bootstrap/Spinner';
+import Alert from 'react-bootstrap/Alert';
+import Pagination from '../../components/pagination/Pagination';
 
-const Home = () => {
-  const [news, setNews] = useState([]);
+const SubscribedArticlesPage = () => {
+  const dispatch = useDispatch();
+  const subscribedArticles = useSelector(selectSubscribedArticles);
+  const articlesStatus = useSelector((state) => state.articles.status);
+  const totalResults = useSelector(selectTotalResults);
+  const totalPages = Math.ceil(totalResults / 10);
+
+  const [currentPage, setCurrentPage] = useState(1);
 
   useEffect(() => {
-    fetchCountryNews('EG');
-  }, []);
+    dispatch(fetchSubscribedArticles({ page: currentPage, pageSize: 10 }));
+  }, [dispatch, currentPage]);
 
-  const fetchCountryNews = async (countryCode) => {
-    const newsApiKey = "f7d3b498b0b84f7399e6590959523a9e";
-    // const apiUrl = `https://api.worldnewsapi.com/search-news?api-key=${newsApiKey}&source-countries=${countryCode}`;
-
-    // const newsApiKey = "68fb124a64a44dec8c9cfd73d2c09c42";
-    // const apiUrl = 'https://newsapi.org/v2/top-headlines/sources?country=us&category=business&apiKey=68fb124a64a44dec8c9cfd73d2c09c42';
-
-    const apiUrl = ``;
-    
-    // try {
-    //   const response = await axios.get(apiUrl);
-    //   if (response.status === 200) {
-    //     setNews(response.data.news);
-    //   } else {
-    //     console.error("Error: Unable to fetch data.");
-    //   }
-    // } catch (error) {
-    //   console.error("Exception:", error.message);
-    // }
+  const handlePageChange = (page) => {
+    setCurrentPage(page);
   };
 
   return (
-    <div className="container mt-5">
-      <h2>Home page</h2>
-      <div className="row" id="newsSection">
-        {news.map((newsItem) => (
-          <div key={newsItem.id} className="col-md-3 col-sm-6 overflow-hidden">
-            <div className="news-box">
-              <div className="new-thumb" style={{ height: '159.69px' }}>
-                <span className="cat c1">General</span>
-                <img className="h-100" src={newsItem.image} alt="no-image" />
+    <div className="">
+      <h1 className="mb-4">Subscribed Articles</h1>
+
+      {articlesStatus === 'loading' && (
+        <Spinner animation="border" role="status">
+          <span className="sr-only">Loading...</span>
+        </Spinner>
+      )}
+
+      {articlesStatus === 'failed' && (
+        <Alert variant="danger">
+          Error fetching subscribed articles. Please try again later.
+        </Alert>
+      )}
+
+      {articlesStatus === 'succeeded' && (
+        <div>
+          <div className="row">
+            {subscribedArticles.map((article, index) => (
+              <div key={`key_${index}`} className="col-lg-4 col-md-6 mb-4">
+                <ArticleCard article={article} />
               </div>
-              <div className="new-txt">
-                <ul className="news-meta">
-                  <li>{newsItem.publish_date}</li>
-                </ul>
-                <h6 style={{ lineHeight: 1.2, maxHeight: '110px' }}>
-                  <a href="index.html#">{newsItem.title}</a>
-                </h6>
-                <div className="bg-white position-relative">
-                  <p style={{ height: '170px', overflow: 'hidden' }} className="bg-white overflow-hidden">
-                    {newsItem.text.substring(0, 100).replace(/ (\S+)$/, '.')}
-                  </p>
-                </div>
-              </div>
-              <div className="news-box-f">
-                <img src="https://www.pngitem.com/pimgs/m/150-1503945_transparent-user-png-default-user-image-png-png.png" alt="" />
-                {newsItem.author.split(" ", 1)[0]}
-                <a href="index.html#"><i className="fas fa-arrow-right"></i></a>
-              </div>
-            </div>
+            ))}
           </div>
-        ))}
-      </div>
+          <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={handlePageChange} />
+        </div>
+      )}
     </div>
   );
 };
 
-export default Home;
+export default SubscribedArticlesPage;

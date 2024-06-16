@@ -11,6 +11,6 @@ exports.getArticlesByUserSubscriptions = async (userId, page = 1, pageSize = 10)
   }
   const subscribedSources = user.subscriptions;
 
-  const articles = await fetchArticlesBySubscriptions(subscribedSources, page, pageSize);
-  return articles;
+  const data = await fetchArticlesBySubscriptions(subscribedSources, page, pageSize);
+  return data;
 };

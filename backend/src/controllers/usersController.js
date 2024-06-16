@@ -90,3 +90,11 @@ exports.updateUser = async (id, { fullName, email, password }) => {
   }
   return user;
 };
+
+exports.getUser = async (userId) => {
+  const user = await User.findById(userId).select('-password');
+  if (!user) {
+    throw new CustomError('User not found', 404);
+  }
+  return user;
+};

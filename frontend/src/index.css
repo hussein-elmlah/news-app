@@ -25,18 +25,17 @@ a:hover {
 body {
   /* padding-top: 56px; */
   margin: 0;
-  display: flex;
-  place-items: center;
-  justify-content: center;
-  min-width: 320px;
-  min-height: 100vh;
+  /* display: flex; */
+  /* place-items: center; */
+  /* justify-content: center; */
+  /* min-width: 320px; */
+  /* background-color: aqua; */
+  /* min-height: calc(100vh - 56px); */
 }
 
 h1 {
   font-size: 3.2em;
   line-height: 1.1;
-  background-color: red;
-
 }
 /* 
 button {

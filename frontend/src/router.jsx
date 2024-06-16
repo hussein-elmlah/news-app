@@ -7,16 +7,19 @@ import Navbar from "./components/navbar/Navbar";
 import Footer from "./components/footer/Footer";
 import NotFoundPage from "./pages/NotFoundPage/NotFoundPage";
 import Home from "./pages/Home/Home";
-import SourcesPage from "./pages/SourcesPage/SourcesPage";
 import LoginHistory from "./pages/LoginHistory/LoginHistory";
+import AllSourcesPage from "./pages/AllSourcesPage/AllSourcesPage";
+import TopFiveSourcesPage from "./pages/TopFiveSourcesPage/TopFiveSourcesPage";
 
 function UserLayout() {
 
     return (
       <>
         <Navbar />
+        <div className="container" style={{ paddingTop: "56px", minHeight: "calc(100vh - 72px)" }}>
         <Outlet />
-        {/* <Footer /> */}
+      </div>
+      <Footer />
       </>
     )
 
@@ -31,13 +34,17 @@ const router = createBrowserRouter([
         element: <Home />
       },  
       {
-        path: "/resources",
-        element: <SourcesPage />
+        path: "/sources",
+        element: <AllSourcesPage />
       },   
       {
         path: "/history",
         element: <LoginHistory />
-      },    
+      },
+      {
+        path: "/top-subscribed",
+        element: <TopFiveSourcesPage />
+      },
       {
         path: "/login",
         element: <Login />

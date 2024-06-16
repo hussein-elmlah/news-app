@@ -45,7 +45,7 @@ exports.fetchArticlesBySubscriptions = async (subscribedSources, page = 1, pageS
       },
     });
 
-    return response.data.articles;
+    return response.data; // all the response , need to destruct articles
   } catch (error) {
     throw new CustomError(`Failed to fetch articles: ${error.message}`, 500);
   }

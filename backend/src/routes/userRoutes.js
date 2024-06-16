@@ -45,4 +45,13 @@ router.post('/logout', authenticateUser, async (req, res, next) => {
   res.json({ message: 'Logout successful' });
 });
 
+router.get('/', authenticateUser, async (req, res, next) => {
+  const userId = req.user._id;
+  const [err, user] = await asyncWrapper(UsersController.getUser(userId));
+  if (err) {
+    return next(err);
+  }
+  res.json(user);
+});
+
 module.exports = router;

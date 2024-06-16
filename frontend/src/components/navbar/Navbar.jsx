@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { userLogout } from '../../axios/userAuth';
+import { userLogout } from '../../axios/user';
 
 const Navbar = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -29,7 +29,10 @@ const Navbar = () => {
               <a className="nav-link" href="/">Home</a>
             </li>
             <li className="nav-item">
-              <a className="nav-link" href="/resources">Resources</a>
+              <a className="nav-link" href="/sources">Sources</a>
+            </li>
+            <li className="nav-item">
+              <a className="nav-link" href="/top-subscribed">Top subscribed</a>
             </li>
             <li className="nav-item">
               <a className="nav-link" href="/history">History</a>

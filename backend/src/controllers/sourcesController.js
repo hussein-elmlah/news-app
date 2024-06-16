@@ -25,7 +25,7 @@ exports.subscribeSource = async (userId, sourceToSubscribe) => {
     );
   }
 
-await User.findByIdAndUpdate(
+  await User.findByIdAndUpdate(
     userId,
     { $addToSet: { subscriptions: sourceId } },
     { new: true },

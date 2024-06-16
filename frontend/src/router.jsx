@@ -7,7 +7,7 @@ import Navbar from "./components/navbar/Navbar";
 import Footer from "./components/footer/Footer";
 import NotFoundPage from "./pages/NotFoundPage/NotFoundPage";
 import Home from "./pages/Home/Home";
-import ResourcesPage from "./pages/ResourcesPage/ResourcesPage";
+import SourcesPage from "./pages/SourcesPage/SourcesPage";
 
 function UserLayout() {
 
@@ -31,7 +31,7 @@ const router = createBrowserRouter([
       },  
       {
         path: "/resources",
-        element: <ResourcesPage />
+        element: <SourcesPage />
       },      
       {
         path: "/login",

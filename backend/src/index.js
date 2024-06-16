@@ -1,24 +1,35 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
+const helmet = require('helmet');
+const logger = require('./lib/logger');
+const pinoHttp = require('pino-http');
 const userRoutes = require('./routes/userRoutes');
 const errorHandler = require('./middlewares/errorHandler');
 
 const { PORT, MONGODB_URI } = require('./config');
 
 const app = express();
+app.use(helmet());
 
 mongoose
   .connect(MONGODB_URI)
   .then(() => {
-    console.log('Connected to MongoDB database');
+    logger.info('Connected to MongoDB database');
   })
   .catch((err) => {
-    console.error('Error connecting to MongoDB:', err.message);
+    logger.error('Error connecting to MongoDB:', err.message);
   });
 
 app.use(express.json());
-app.use(cors());
+app.use(pinoHttp({ logger }));
+
+app.use(cors()); // should be confirued in production
+// app.use(cors({
+//   origin: '*', // add allowed origins only in production
+//   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
+//   allowedHeaders: ['Content-Type', 'Authorization'],
+// }));
 
 app.use('/users', userRoutes);
 
@@ -28,10 +39,15 @@ app.use('*', (req, res) => {
 
 app.use(errorHandler);
 
-process.on('uncaughtException', (err) => {
-  console.log('Uncaught exception occurred:\n', err);
+process.on('uncaughtException', (exception) => {
+  logger.error('Uncaught exception occurred:\n', exception);
+  // here use process.exit(1); and use process manager to restart at any stop in deployment phase.
+});
+process.on('unhandledRejection', (exception) => {
+  logger.error('unhandled Rejection occurred:\n', exception);
+  // here use process.exit(1); and use process manager to restart at any stop in deployment phase.
 });
 
 app.listen(PORT, () => {
-  console.log(`Server is running on http://localhost:${PORT}`);
+  logger.info(`Server is running on http://localhost:${PORT}`);
 });

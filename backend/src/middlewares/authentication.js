@@ -31,7 +31,6 @@ const authenticateUser = async (req, res, next) => {
 
     // Attach user object to request
     req.user = user;
-    console.log('request user ', req.user);
     next(); // Call the next middleware function
   } catch (error) {
     // Handle errors

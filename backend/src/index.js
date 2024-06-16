@@ -5,6 +5,8 @@ const helmet = require('helmet');
 const pinoHttp = require('pino-http');
 const logger = require('./lib/logger');
 const userRoutes = require('./routes/userRoutes');
+const sourcesRoutes = require('./routes/sourcesRoutes');
+const articlesRoutes = require('./routes/articlesRoutes');
 const errorHandler = require('./middlewares/errorHandler');
 
 const { PORT, MONGODB_URI } = require('./config');
@@ -22,7 +24,7 @@ mongoose
   });
 
 app.use(express.json());
-app.use(pinoHttp({ logger }));
+// app.use(pinoHttp({ logger }));
 
 app.use(cors()); // should be confirued in production
 // app.use(cors({
@@ -32,6 +34,8 @@ app.use(cors()); // should be confirued in production
 // }));
 
 app.use('/users', userRoutes);
+app.use('/sources', sourcesRoutes);
+app.use('/articles', articlesRoutes);
 
 app.use('*', (req, res) => {
   res.status(404).send('Not found');

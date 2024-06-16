@@ -11,8 +11,12 @@ const Home = () => {
   const fetchCountryNews = async (countryCode) => {
     const newsApiKey = "f7d3b498b0b84f7399e6590959523a9e";
     // const apiUrl = `https://api.worldnewsapi.com/search-news?api-key=${newsApiKey}&source-countries=${countryCode}`;
-    const apiUrl = '';
 
+    // const newsApiKey = "68fb124a64a44dec8c9cfd73d2c09c42";
+    // const apiUrl = 'https://newsapi.org/v2/top-headlines/sources?country=us&category=business&apiKey=68fb124a64a44dec8c9cfd73d2c09c42';
+
+    const apiUrl = ``;
+    
     // try {
     //   const response = await axios.get(apiUrl);
     //   if (response.status === 200) {

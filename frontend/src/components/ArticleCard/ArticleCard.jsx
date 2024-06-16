@@ -3,7 +3,7 @@ const ArticleCard = ({ article }) => {
 
 
   return (
-    <div className="card mb-3 overflow-hidden p-3" style={{ height: "380px"}}>
+    <div className="card mb-3 overflow-hidden p-3" style={{ height: "330px"}}>
       <div className="row g-0">
         <div className="col-md-4">
           <img src={article.urlToImage} className="img-fluid rounded-start" alt={article.title} />

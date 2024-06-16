@@ -1,20 +1,28 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchSources, selectSources } from '../../store/slices/sourceSlice';
+import { fetchSources, selectSources, selectSourcesStatus, selectTotalResults } from '../../store/slices/sourceSlice';
 import SourceCard from '../../components/SourceCard/SourceCard';
 import Spinner from 'react-bootstrap/Spinner';
 import Alert from 'react-bootstrap/Alert';
+import Pagination from '../../components/pagination/Pagination';
 
 const AllSourcesPage = () => {
+  const desiredPageSize = 6;
   const dispatch = useDispatch();
   const sources = useSelector(selectSources);
-  const sourcesStatus = useSelector((state) => state.sources.status);
+  const sourcesStatus = useSelector(selectSourcesStatus);
+  const totalResults = useSelector(selectTotalResults);
+  const totalPages = Math.ceil(totalResults / desiredPageSize);
+
+  const [currentPage, setCurrentPage] = useState(1);
 
   useEffect(() => {
-    if (sourcesStatus === 'idle') {
-      dispatch(fetchSources());
-    }
-  }, [dispatch, sourcesStatus]);
+    dispatch(fetchSources({ page: currentPage, pageSize: desiredPageSize }));
+  }, [dispatch, currentPage]);
+
+  const handlePageChange = (page) => {
+    setCurrentPage(page);
+  };
 
   return (
     <div className="">
@@ -33,12 +41,15 @@ const AllSourcesPage = () => {
       )}
 
       {sourcesStatus === 'succeeded' && (
-        <div className="row">
-          {sources.map((source) => (
-            <div key={source.id} className="col-lg-4 col-md-6 mb-4">
-              <SourceCard source={source} />
-            </div>
-          ))}
+        <div>
+          <div className="row">
+            {sources.map((source) => (
+              <div key={source.id} className="col-lg-4 col-md-6 mb-4">
+                <SourceCard source={source} />
+              </div>
+            ))}
+          </div>
+          <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={handlePageChange} />
         </div>
       )}
     </div>

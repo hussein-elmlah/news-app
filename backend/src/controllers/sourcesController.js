@@ -3,7 +3,7 @@ const CustomError = require('../lib/customError');
 const { fetchSources } = require('../services/newsAPI');
 const User = require('../models/User');
 
-exports.getAllSources = () => fetchSources();
+exports.getAllSources = (page, pageSize) => fetchSources(page, pageSize);
 
 exports.subscribeSource = async (userId, sourceToSubscribe) => {
   const sourceId = sourceToSubscribe.id;

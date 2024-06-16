@@ -1,5 +1,3 @@
-// src/components/LoginHistory.js
-
 import React, { useEffect, useState } from 'react';
 import { getLoginHistory } from '../../axios/user';
 

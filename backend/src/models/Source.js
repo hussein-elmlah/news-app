@@ -11,7 +11,6 @@ const sourceSchema = new mongoose.Schema(
     country: { type: String },
     subscribers: { type: Number, default: 0 },
   },
-//   { timestamps: true, runValidators: true },
 );
 
 sourceSchema.set('toJSON', {

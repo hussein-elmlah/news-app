@@ -1,5 +1,5 @@
 const axios = require('axios');
-const User = require('../models/User'); // Adjust path as per your project structure
+const User = require('../models/User');
 const { fetchArticlesBySubscriptions } = require('../services/newsAPI');
 
 exports.getArticlesByUserSubscriptions = async (userId, page = 1, pageSize = 10) => {

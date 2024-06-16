@@ -13,7 +13,7 @@ export const userLogin = (values) => {
 
 export const userLogout = (e) => {
   return axiosInstance.post("/users/logout")
-    .then((response) => {
+    .then(() => {
       localStorage.removeItem("token");
       window.location.href = "/";
     })
@@ -23,10 +23,14 @@ export const userLogout = (e) => {
 };
 
 export const userRegister = (values) => {
-  // console.log(values);
   return axiosInstance.post("/users/register", values);
 };
 
 export const getLoginHistory = () => {
   return axiosInstance.get('/users/history');
+};
+
+export const getUserData = async () => {
+  const response = await axiosInstance.get('/users');
+  return response.data;
 };

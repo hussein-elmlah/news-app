@@ -5,18 +5,21 @@ import ArticleCard from '../../components/ArticleCard/ArticleCard';
 import Spinner from 'react-bootstrap/Spinner';
 import Alert from 'react-bootstrap/Alert';
 import Pagination from '../../components/pagination/Pagination';
+import { selectUser } from '../../store/slices/userSlice';
 
 const SubscribedArticlesPage = () => {
+  const desiredPageSize = 6;
   const dispatch = useDispatch();
   const subscribedArticles = useSelector(selectSubscribedArticles);
   const articlesStatus = useSelector((state) => state.articles.status);
   const totalResults = useSelector(selectTotalResults);
-  const totalPages = Math.ceil(totalResults / 10);
+  const totalPages = Math.floor(totalResults / desiredPageSize);
+  const user = useSelector(selectUser);
 
   const [currentPage, setCurrentPage] = useState(1);
 
   useEffect(() => {
-    dispatch(fetchSubscribedArticles({ page: currentPage, pageSize: 10 }));
+    dispatch(fetchSubscribedArticles({ page: currentPage, pageSize: desiredPageSize }));
   }, [dispatch, currentPage]);
 
   const handlePageChange = (page) => {
@@ -33,7 +36,7 @@ const SubscribedArticlesPage = () => {
         </Spinner>
       )}
 
-      {articlesStatus === 'failed' && (
+      {articlesStatus === 'failed' && user?.subscribtions?.length === 0 && (
         <Alert variant="danger">
           Error fetching subscribed articles. Please try again later.
         </Alert>
@@ -43,7 +46,7 @@ const SubscribedArticlesPage = () => {
         <div>
           <div className="row">
             {subscribedArticles.map((article, index) => (
-              <div key={`key_${index}`} className="col-lg-4 col-md-6 mb-4">
+              <div key={`key${index}`} className="col-lg-4 col-md-6 mb-4">
                 <ArticleCard article={article} />
               </div>
             ))}

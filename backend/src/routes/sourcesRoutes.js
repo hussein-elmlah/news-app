@@ -6,7 +6,10 @@ const asyncWrapper = require('../lib/async-wrapper');
 const { authenticateUser } = require('../middlewares/authentication');
 
 router.get('/', async (req, res, next) => {
-  const [err, sources] = await asyncWrapper(SourcesController.getAllSources());
+  const page = parseInt(req.query.page, 10) || 1;
+  const pageSize = parseInt(req.query.pageSize, 10) || 10;
+  
+  const [err, sources] = await asyncWrapper(SourcesController.getAllSources(page, pageSize));
   if (err) return next(err);
   res.json(sources);
 });

@@ -1,24 +1,41 @@
 const axios = require('axios');
 const CustomError = require('../lib/customError');
 const redisClient = require('../lib/redis');
+const { apiKey, baseUrl } = require('../config');
 
-// const apiKey = '';
-const apiKey = '68fb124a64a44dec8c9cfd73d2c09c42';
-const baseUrl = 'https://newsapi.org/v2';
+exports.fetchSources = async (page = 1, pageSize = 10) => {
+  const sourcesCacheKey = 'newsSources';
+  const totalCountCacheKey = 'totalCount';
+  const TTL_SECONDS = 3600;
 
-exports.fetchSources = async () => {
   try {
-    const response = await axios.get(`${baseUrl}/sources`, {
-      params: {
-        apiKey,
-      },
-    });
-    return response.data.sources;
+    let sources = await redisClient.get(sourcesCacheKey);
+    let totalCount = await redisClient.get(totalCountCacheKey);
+
+    if (sources && totalCount) {
+      console.log('Fetching sources from Redis cache...');
+      sources = JSON.parse(sources);
+      totalCount = JSON.parse(totalCount);
+    } else {
+      const response = await axios.get(`${baseUrl}/sources`, {
+        params: { apiKey },
+      });
+
+      sources = response.data.sources;
+      totalCount = sources.length;
+
+      await redisClient.set(sourcesCacheKey, JSON.stringify(sources), 'EX', TTL_SECONDS);
+      await redisClient.set(totalCountCacheKey, JSON.stringify(totalCount), 'EX', TTL_SECONDS);
+    }
+
+    const startIndex = (page - 1) * pageSize;
+    const paginatedSources = sources.slice(startIndex, startIndex + pageSize);
+
+    return { sources: paginatedSources, totalResults: totalCount };
   } catch (error) {
     throw new CustomError(`Failed to fetch sources: ${error.message}`, 500);
   }
 };
-
 exports.fetchArticlesBySubscriptions = async (subscribedSources, page = 1, pageSize = 10) => {
   const cacheKey = `subscribedArticles:${subscribedSources.join(',')}:${page}:${pageSize}`;
   const TTL_SECONDS = 3600;
@@ -40,7 +57,7 @@ exports.fetchArticlesBySubscriptions = async (subscribedSources, page = 1, pageS
 
     await redisClient.set(cacheKey, JSON.stringify(response.data), 'EX', TTL_SECONDS);
 
-    return response.data; // all the response, need to destruct articles
+    return response.data; // Data is compination of articles array and totalResults number.
   } catch (error) {
     throw new CustomError(`Failed to fetch articles: ${error.message}`, 500);
   }

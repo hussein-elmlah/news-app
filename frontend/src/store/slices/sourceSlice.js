@@ -1,15 +1,22 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import { getAllSources, getTopFiveSources, subscribeSource, unsubscribeSource } from '../../axios/sourcesAndArticles';
+import { getPaginatedSources, getTopFiveSources } from '../../axios/sourcesAndArticles';
 
-export const fetchSources = createAsyncThunk('sources/fetchSources', async () => {
-  const response = await getAllSources();
-  return response;
-});
+export const fetchSources = createAsyncThunk(
+  'sources/fetchSources',
+  async ({ page = 1, pageSize = 10 }, { rejectWithValue }) => {
+    try {
+      const response = await getPaginatedSources(page, pageSize);
+      return response;
+    } catch (error) {
+      return rejectWithValue(error.message);
+    }
+  }
+);
 
 export const fetchTopFiveSources = createAsyncThunk('sources/topFive', async () => {
-  const response = await getTopFiveSources();
-  return response;
-});
+    const response = await getTopFiveSources();
+    return response;
+  });
 
 const sourcesSlice = createSlice({
   name: 'sources',
@@ -18,8 +25,13 @@ const sourcesSlice = createSlice({
     topFiveSources: [],
     status: 'idle',
     error: null,
+    totalResults: 0,
   },
-  reducers: {},
+  reducers: {
+    setCurrentPage: (state, action) => {
+      state.currentPage = action.payload;
+    },
+  },
   extraReducers: (builder) => {
     builder
       .addCase(fetchSources.pending, (state) => {
@@ -27,11 +39,12 @@ const sourcesSlice = createSlice({
       })
       .addCase(fetchSources.fulfilled, (state, action) => {
         state.status = 'succeeded';
-        state.sources = action.payload;
+        state.sources = action.payload.sources;
+        state.totalResults = action.payload.totalResults;
       })
       .addCase(fetchSources.rejected, (state, action) => {
         state.status = 'failed';
-        state.error = action.error.message;
+        state.error = action.payload;
       })
       .addCase(fetchTopFiveSources.pending, (state) => {
         state.status = 'loading';
@@ -47,6 +60,10 @@ const sourcesSlice = createSlice({
   },
 });
 
-export default sourcesSlice.reducer;
-export const selectSources = (state) => state.sources.sources;
+
+export const selectSourcesStatus = (state) => state.sources.status;
 export const selectTopFiveSources = (state) => state.sources.topFiveSources;
+export const selectSources = (state) => state.sources.sources;
+export const selectTotalResults = (state) => state.sources.totalResults;
+
+export default sourcesSlice.reducer;

@@ -4,7 +4,6 @@ const path = require('path');
 const { multistream } = require('pino-multi-stream');
 const pretty = require('pino-pretty');
 
-// Ensure log directory exists
 const logDirectory = path.join(__dirname, '..', 'logs');
 if (!fs.existsSync(logDirectory)) {
   fs.mkdirSync(logDirectory);

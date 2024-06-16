@@ -14,7 +14,7 @@ const SourceCard = ({ source }) => {
     setLoading(true);
     subscribeSource(source)
       .then(() => {
-        dispatch(fetchUserData()); // Fetch updated user data
+        dispatch(fetchUserData());
       })
       .catch((error) => console.error("Subscription failed:", error))
       .finally(() => setLoading(false));
@@ -24,7 +24,7 @@ const SourceCard = ({ source }) => {
     setLoading(true);
     unsubscribeSource(source.id)
       .then(() => {
-        dispatch(fetchUserData()); // Fetch updated user data
+        dispatch(fetchUserData());
       })
       .catch((error) => console.error("Unsubscription failed:", error))
       .finally(() => setLoading(false));
@@ -34,7 +34,7 @@ const SourceCard = ({ source }) => {
     <div className="card mb-3" style={{ height: "220px"}}>
       <div className="card-body d-flex flex-column">
         <h5 className="card-title">{source.name}</h5>
-        <p className="card-text flex-grow-1">{source.description}</p>
+        <p className="card-text flex-grow-1">{source.description.slice(0,150)}</p>
         <div className="mt-auto">
           {loading ? (
             <button className="btn btn-secondary" disabled>Loading...</button>

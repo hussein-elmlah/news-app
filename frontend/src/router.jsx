@@ -1,6 +1,5 @@
 import { Outlet, createBrowserRouter } from "react-router-dom";
-
-
+import PrivateRoute from "./PrivateRoute";
 import Login from "./pages/Login/Login";
 import Register from "./pages/Register/Register";
 import Navbar from "./components/navbar/Navbar";
@@ -12,17 +11,15 @@ import AllSourcesPage from "./pages/AllSourcesPage/AllSourcesPage";
 import TopFiveSourcesPage from "./pages/TopFiveSourcesPage/TopFiveSourcesPage";
 
 function UserLayout() {
-
-    return (
-      <>
-        <Navbar />
-        <div className="container" style={{ paddingTop: "56px", minHeight: "calc(100vh - 72px)" }}>
+  return (
+    <>
+      <Navbar />
+      <div className="container" style={{ paddingTop: "56px", minHeight: "calc(100vh - 72px)" }}>
         <Outlet />
       </div>
       <Footer />
-      </>
-    )
-
+    </>
+  );
 }
 
 const router = createBrowserRouter([
@@ -31,19 +28,19 @@ const router = createBrowserRouter([
     children: [
       {
         path: "/",
-        element: <Home />
+        element: <PrivateRoute element={<Home />} />
       },  
       {
         path: "/sources",
-        element: <AllSourcesPage />
+        element: <PrivateRoute element={<AllSourcesPage />} />
       },   
       {
         path: "/history",
-        element: <LoginHistory />
+        element: <PrivateRoute element={<LoginHistory />} />
       },
       {
         path: "/top-subscribed",
-        element: <TopFiveSourcesPage />
+        element: <PrivateRoute element={<TopFiveSourcesPage />} />
       },
       {
         path: "/login",
@@ -53,12 +50,12 @@ const router = createBrowserRouter([
         path: "/register",
         element: <Register />
       },
-      
       {
         path: "*",
         element: <NotFoundPage />,
       },
-    ]},
-  ]);
+    ],
+  },
+]);
 
 export default router;

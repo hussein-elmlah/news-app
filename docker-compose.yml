@@ -1,0 +1,35 @@
+version: '3.8'
+
+services:
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "3000:80"  # Map host port 3000 to container port 80
+    environment:
+      - VITE_BASE_URL=http://localhost:3000
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - "5000:3000"  # Map host port 5000 to container port 3000
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+      - MONGODB_URI=mongodb://mongo:27017/news_db
+      - JWT_SECRET=local_JWT_Secret_test123
+    depends_on:
+      - mongo
+
+  mongo:
+    image: mongo:7.0.5
+    ports:
+      - "27017:27017"  # Map host port 27017 to container port 27017
+    volumes:
+      - mongodb_data:/data/db
+
+volumes:
+  mongodb_data:

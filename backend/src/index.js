@@ -2,8 +2,8 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const helmet = require('helmet');
-const logger = require('./lib/logger');
 const pinoHttp = require('pino-http');
+const logger = require('./lib/logger');
 const userRoutes = require('./routes/userRoutes');
 const errorHandler = require('./middlewares/errorHandler');
 
@@ -48,6 +48,28 @@ process.on('unhandledRejection', (exception) => {
   // here use process.exit(1); and use process manager to restart at any stop in deployment phase.
 });
 
-app.listen(PORT, () => {
+const server = app.listen(PORT, () => {
   logger.info(`Server is running on http://localhost:${PORT}`);
+});
+
+// Handle termination signals for graceful shutdown
+function shutdown() {
+  server.close((err) => {
+    if (err) {
+      console.error('Error closing server:', err);
+      process.exit(1);
+    }
+    console.log('Server closed gracefully');
+    process.exit(0);
+  });
+}
+
+process.on('SIGINT', () => {
+  console.log('Received SIGINT signal. Closing server gracefully...');
+  shutdown();
+});
+
+process.on('SIGTERM', () => {
+  console.log('Received SIGTERM signal. Closing server gracefully...');
+  shutdown();
 });

@@ -48,7 +48,7 @@ const Login = () => {
         })
         .catch((error) => {
           console.error('Login failed:', error);
-          setErrors({ general: 'Login failed. Please try again.' });
+          setErrors({ general: 'Login failed.' });
           setIsSubmitting(false);
         });
     }

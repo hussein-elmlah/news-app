@@ -4,6 +4,8 @@ const redisClient = require('../lib/redis');
 const { apiKey, baseUrl } = require('../config');
 
 exports.fetchSources = async (page = 1, pageSize = 10) => {
+  page = Number(page);
+  pageSize = Number(pageSize);
   const sourcesCacheKey = 'newsSources';
   const totalCountCacheKey = 'totalCount';
   const TTL_SECONDS = 3600;
@@ -36,28 +38,86 @@ exports.fetchSources = async (page = 1, pageSize = 10) => {
     throw new CustomError(`Failed to fetch sources: ${error.message}`, 500);
   }
 };
-exports.fetchArticlesBySubscriptions = async (subscribedSources, page = 1, pageSize = 10) => {
-  const cacheKey = `subscribedArticles:${subscribedSources.join(',')}:${page}:${pageSize}`;
-  const TTL_SECONDS = 3600;
-  try {
-    const cachedData = await redisClient.get(cacheKey);
-    if (cachedData) {
-      return JSON.parse(cachedData);
-    }
 
-    const sourcesParam = subscribedSources.join(',');
-    const response = await axios.get(`${baseUrl}/top-headlines`, {
-      params: {
-        sources: sourcesParam,
-        page,
-        pageSize,
-        apiKey,
-      },
+exports.fetchArticlesBySubscriptions = async (subscribedSources, page = 1, pageSize = 10) => {
+  page = Number(page);
+  pageSize = Number(pageSize);
+  const TTL_SECONDS = 3600;
+  const cacheKeyPrefix = 'articles';
+  const cachedResults = {};
+
+  try {
+    const cachePromises = subscribedSources.map(source =>
+      redisClient.get(`${cacheKeyPrefix}:${source}`).catch(err => {
+        return null;
+      })
+    );
+
+    const cachedDataArray = await Promise.all(cachePromises);
+
+    const sourcesToFetch = [];
+    cachedDataArray.forEach((cachedData, index) => {
+      const source = subscribedSources[index];
+      if (cachedData) {
+        cachedResults[source] = JSON.parse(cachedData);
+      } else {
+        sourcesToFetch.push(source);
+      }
     });
 
-    await redisClient.set(cacheKey, JSON.stringify(response.data), 'EX', TTL_SECONDS);
+    const fetchAllArticles = async (source, pageSize) => {
+      let page = 1;
+      let allArticles = [];
+      let totalResults = 0;
 
-    return response.data; // Data is compination of articles array and totalResults number.
+      while (true) {
+        const response = await axios.get(`${baseUrl}/top-headlines`, {
+          params: {
+            sources: source,
+            page,
+            pageSize,
+            apiKey,
+          },
+        });
+
+        const articles = response.data.articles;
+        if (articles.length === 0) break;
+
+        allArticles = allArticles.concat(articles);
+        totalResults = response.data.totalResults;
+        page++;
+
+        if (allArticles.length >= totalResults) break;
+      }
+
+      return allArticles;
+    };
+
+    if (sourcesToFetch.length > 0) {
+      for (const source of sourcesToFetch) {
+        const sourceArticles = await fetchAllArticles(source, 100);
+        if (sourceArticles.length > 0) {
+          cachedResults[source] = sourceArticles;
+          await redisClient.set(`${cacheKeyPrefix}:${source}`, JSON.stringify(sourceArticles), 'EX', TTL_SECONDS);
+        }
+      }
+    }
+
+    const articles = [];
+    for (const source of subscribedSources) {
+      articles.push(...(cachedResults[source] || []));
+    }
+
+    articles.sort((a, b) => new Date(b.publishedAt) - new Date(a.publishedAt));
+
+    const startIndex = (page - 1) * pageSize;
+
+    const paginatedArticles = articles.slice(startIndex, startIndex + pageSize);
+
+    const totalResults = articles.length;
+
+    const dataToReturn = { articles: paginatedArticles, totalResults };
+    return dataToReturn;
   } catch (error) {
     throw new CustomError(`Failed to fetch articles: ${error.message}`, 500);
   }

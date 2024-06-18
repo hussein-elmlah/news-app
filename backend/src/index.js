@@ -24,7 +24,7 @@ mongoose
   });
 
 app.use(express.json());
-app.use(pinoHttp({ logger }));
+// app.use(pinoHttp({ logger }));
 
 app.use(cors()); // should be confirued in production
 // app.use(cors({

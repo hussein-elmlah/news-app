@@ -6,7 +6,7 @@ services:
       context: ./frontend
       dockerfile: Dockerfile
     ports:
-      - "3000:80"  # Map host port 3000 to container port 80
+      - "5173:5173"
     environment:
       - VITE_BASE_URL=http://localhost:3000
 
@@ -15,7 +15,7 @@ services:
       context: ./backend
       dockerfile: Dockerfile
     ports:
-      - "5000:3000"  # Map host port 5000 to container port 3000
+      - "3000:3000"
     environment:
       - NODE_ENV=production
       - PORT=3000
@@ -23,13 +23,22 @@ services:
       - JWT_SECRET=local_JWT_Secret_test123
     depends_on:
       - mongo
+      - redis
 
   mongo:
     image: mongo:7.0.5
     ports:
-      - "27017:27017"  # Map host port 27017 to container port 27017
+      - "27017:27017"
     volumes:
       - mongodb_data:/data/db
 
+  redis:
+    image: redis:7.2.5
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+
 volumes:
   mongodb_data:
+  redis-data:

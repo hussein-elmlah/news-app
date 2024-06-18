@@ -7,6 +7,6 @@ module.exports = {
   PORT: parseInt(PORT, 10) || 3000,
   MONGODB_URI: MONGODB_URI || 'mongodb://localhost:27017/news_db',
 
-  apiKey: '68fb124a64a44dec8c9cfd73d2c09c42',
+  apiKey: '7172a2f0b71e4f8dbb5a3707f0f89742',
   baseUrl: 'https://newsapi.org/v2',
 };

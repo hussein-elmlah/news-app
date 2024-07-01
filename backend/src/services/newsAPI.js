@@ -1,7 +1,12 @@
+/* eslint-disable no-param-reassign */
+/* eslint-disable no-plusplus */
+/* eslint-disable no-restricted-syntax */
+/* eslint-disable no-await-in-loop */
 const axios = require('axios');
 const CustomError = require('../lib/customError');
 const redisClient = require('../lib/redis');
 const { apiKey, baseUrl } = require('../config');
+const logger = require('../lib/logger');
 
 exports.fetchSources = async (page = 1, pageSize = 10) => {
   page = Number(page);
@@ -15,7 +20,7 @@ exports.fetchSources = async (page = 1, pageSize = 10) => {
     let totalCount = await redisClient.get(totalCountCacheKey);
 
     if (sources && totalCount) {
-      console.log('Fetching sources from Redis cache...');
+      logger.log('Fetching sources from Redis cache...');
       sources = JSON.parse(sources);
       totalCount = JSON.parse(totalCount);
     } else {
@@ -47,11 +52,7 @@ exports.fetchArticlesBySubscriptions = async (subscribedSources, page = 1, pageS
   const cachedResults = {};
 
   try {
-    const cachePromises = subscribedSources.map(source =>
-      redisClient.get(`${cacheKeyPrefix}:${source}`).catch(err => {
-        return null;
-      })
-    );
+    const cachePromises = subscribedSources.map((source) => redisClient.get(`${cacheKeyPrefix}:${source}`).catch((err) => null));
 
     const cachedDataArray = await Promise.all(cachePromises);
 
@@ -65,8 +66,8 @@ exports.fetchArticlesBySubscriptions = async (subscribedSources, page = 1, pageS
       }
     });
 
-    const fetchAllArticles = async (source, pageSize) => {
-      let page = 1;
+    const fetchAllArticles = async (source, maxPageSize) => {
+      let currentPage = 1;
       let allArticles = [];
       let totalResults = 0;
 
@@ -74,18 +75,18 @@ exports.fetchArticlesBySubscriptions = async (subscribedSources, page = 1, pageS
         const response = await axios.get(`${baseUrl}/top-headlines`, {
           params: {
             sources: source,
-            page,
-            pageSize,
+            currentPage,
+            maxPageSize,
             apiKey,
           },
         });
 
-        const articles = response.data.articles;
+        const { articles } = response.data;
         if (articles.length === 0) break;
 
         allArticles = allArticles.concat(articles);
         totalResults = response.data.totalResults;
-        page++;
+        currentPage++;
 
         if (allArticles.length >= totalResults) break;
       }

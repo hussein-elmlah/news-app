@@ -1,16 +1,9 @@
-/* eslint-disable no-param-reassign */
-/* eslint-disable no-plusplus */
-/* eslint-disable no-restricted-syntax */
-/* eslint-disable no-await-in-loop */
 const axios = require('axios');
 const CustomError = require('../lib/customError');
 const redisClient = require('../lib/redis');
 const { apiKey, baseUrl } = require('../config');
-const logger = require('../lib/logger');
 
 exports.fetchSources = async (page = 1, pageSize = 10) => {
-  page = Number(page);
-  pageSize = Number(pageSize);
   const sourcesCacheKey = 'newsSources';
   const totalCountCacheKey = 'totalCount';
   const TTL_SECONDS = 3600;
@@ -20,7 +13,7 @@ exports.fetchSources = async (page = 1, pageSize = 10) => {
     let totalCount = await redisClient.get(totalCountCacheKey);
 
     if (sources && totalCount) {
-      logger.log('Fetching sources from Redis cache...');
+      console.log('Fetching sources from Redis cache...');
       sources = JSON.parse(sources);
       totalCount = JSON.parse(totalCount);
     } else {
@@ -45,80 +38,28 @@ exports.fetchSources = async (page = 1, pageSize = 10) => {
 };
 
 exports.fetchArticlesBySubscriptions = async (subscribedSources, page = 1, pageSize = 10) => {
-  page = Number(page);
-  pageSize = Number(pageSize);
+  const sortedSubscribedSources = subscribedSources.slice().sort();
+  const cacheKey = `subscribedArticles:${sortedSubscribedSources.join(',')}:${page}:${pageSize}`;
   const TTL_SECONDS = 3600;
-  const cacheKeyPrefix = 'articles';
-  const cachedResults = {};
-
   try {
-    const cachePromises = subscribedSources.map((source) => redisClient.get(`${cacheKeyPrefix}:${source}`).catch((err) => null));
+    const cachedData = await redisClient.get(cacheKey);
+    if (cachedData) {
+      return JSON.parse(cachedData);
+    }
 
-    const cachedDataArray = await Promise.all(cachePromises);
-
-    const sourcesToFetch = [];
-    cachedDataArray.forEach((cachedData, index) => {
-      const source = subscribedSources[index];
-      if (cachedData) {
-        cachedResults[source] = JSON.parse(cachedData);
-      } else {
-        sourcesToFetch.push(source);
-      }
+    const sourcesParam = sortedSubscribedSources.join(',');
+    const response = await axios.get(`${baseUrl}/everything`, {
+      params: {
+        sources: sourcesParam,
+        page,
+        pageSize,
+        apiKey,
+      },
     });
 
-    const fetchAllArticles = async (source, maxPageSize) => {
-      let currentPage = 1;
-      let allArticles = [];
-      let totalResults = 0;
+    await redisClient.set(cacheKey, JSON.stringify(response.data), 'EX', TTL_SECONDS);
 
-      while (true) {
-        const response = await axios.get(`${baseUrl}/top-headlines`, {
-          params: {
-            sources: source,
-            currentPage,
-            maxPageSize,
-            apiKey,
-          },
-        });
-
-        const { articles } = response.data;
-        if (articles.length === 0) break;
-
-        allArticles = allArticles.concat(articles);
-        totalResults = response.data.totalResults;
-        currentPage++;
-
-        if (allArticles.length >= totalResults) break;
-      }
-
-      return allArticles;
-    };
-
-    if (sourcesToFetch.length > 0) {
-      for (const source of sourcesToFetch) {
-        const sourceArticles = await fetchAllArticles(source, 100);
-        if (sourceArticles.length > 0) {
-          cachedResults[source] = sourceArticles;
-          await redisClient.set(`${cacheKeyPrefix}:${source}`, JSON.stringify(sourceArticles), 'EX', TTL_SECONDS);
-        }
-      }
-    }
-
-    const articles = [];
-    for (const source of subscribedSources) {
-      articles.push(...(cachedResults[source] || []));
-    }
-
-    articles.sort((a, b) => new Date(b.publishedAt) - new Date(a.publishedAt));
-
-    const startIndex = (page - 1) * pageSize;
-
-    const paginatedArticles = articles.slice(startIndex, startIndex + pageSize);
-
-    const totalResults = articles.length;
-
-    const dataToReturn = { articles: paginatedArticles, totalResults };
-    return dataToReturn;
+    return response.data; // Data is compination of articles array and totalResults number.
   } catch (error) {
     throw new CustomError(`Failed to fetch articles: ${error.message}`, 500);
   }

@@ -37,7 +37,7 @@ const LoginHistory = () => {
           </tr>
         </thead>
         <tbody>
-          {loginHistory.map((entry) => (
+          {loginHistory?.map((entry) => (
             <tr key={entry._id}>
               <td>{entry.success ? 'Yes' : 'No'}</td>
               <td>{new Date(entry.timestamp).toLocaleString()}</td>

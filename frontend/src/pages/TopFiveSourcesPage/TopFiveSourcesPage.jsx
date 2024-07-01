@@ -31,7 +31,7 @@ const TopFiveSourcesPage = () => {
 
       {status === 'succeeded' && (
         <div className="row">
-          {topFiveSources.map(source => (
+          {topFiveSources?.map(source => (
             <div key={source.id} className="col-lg-4 col-md-6 mb-4">
               <SourceCard source={source} />
             </div>

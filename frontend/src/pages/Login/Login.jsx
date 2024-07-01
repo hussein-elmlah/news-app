@@ -1,26 +1,31 @@
-import React, { useState } from 'react';
-import { userLogin } from '../../axios/user';
+import React, { useState } from "react";
+import { userLogin } from "../../axios/user";
+import { useNavigate } from "react-router-dom";
+import { useDispatch } from 'react-redux';
+import { fetchUserData } from '../../store/slices/userSlice';
 
 const Login = () => {
   const [formValues, setFormValues] = useState({
-    email: '',
-    password: ''
+    email: "",
+    password: "",
   });
 
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   const validate = (values) => {
     const errors = {};
 
     if (!values.email.trim()) {
-      errors.email = 'Email is required';
-    } else if (!/\S+@\S+\.\S+/.test(values.email)) {
-      errors.email = 'Email is invalid';
+      errors.email = "Email is required";
+    } else if (!/^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/.test(values.email)) {
+      errors.email = "Email is invalid";
     }
 
     if (!values.password.trim()) {
-      errors.password = 'Password is required';
+      errors.password = "Password is required";
     }
 
     return errors;
@@ -30,7 +35,7 @@ const Login = () => {
     const { name, value } = e.target;
     setFormValues({
       ...formValues,
-      [name]: value
+      [name]: value,
     });
   };
 
@@ -43,12 +48,13 @@ const Login = () => {
       setIsSubmitting(true);
       await userLogin(formValues)
         .then((response) => {
-          console.log('Login successful:', response);
-          window.location.href = '/';
+          console.log("Login successful:", response);
+          dispatch(fetchUserData());
+          navigate('/');
         })
         .catch((error) => {
-          console.error('Login failed:', error);
-          setErrors({ general: 'Login failed.' });
+          console.error("Login failed:", error);
+          setErrors({ general: "Login failed." });
           setIsSubmitting(false);
         });
     }
@@ -59,31 +65,45 @@ const Login = () => {
       <h2>Login Form</h2>
       <form onSubmit={handleSubmit}>
         <div className="mb-3">
-          <label htmlFor="email" className="form-label">Email</label>
+          <label htmlFor="email" className="form-label">
+            Email
+          </label>
           <input
             type="email"
-            className={`form-control ${errors.email ? 'is-invalid' : ''}`}
+            className={`form-control ${errors.email ? "is-invalid" : ""}`}
             id="email"
             name="email"
             value={formValues.email}
             onChange={handleChange}
           />
-          {errors.email && <div className="invalid-feedback">{errors.email}</div>}
+          {errors.email && (
+            <div className="invalid-feedback">{errors.email}</div>
+          )}
         </div>
         <div className="mb-3">
-          <label htmlFor="password" className="form-label">Password</label>
+          <label htmlFor="password" className="form-label">
+            Password
+          </label>
           <input
             type="password"
-            className={`form-control ${errors.password ? 'is-invalid' : ''}`}
+            className={`form-control ${errors.password ? "is-invalid" : ""}`}
             id="password"
             name="password"
             value={formValues.password}
             onChange={handleChange}
           />
-          {errors.password && <div className="invalid-feedback">{errors.password}</div>}
+          {errors.password && (
+            <div className="invalid-feedback">{errors.password}</div>
+          )}
         </div>
-        {errors.general && <div className="alert alert-danger">{errors.general}</div>}
-        <button type="submit" className="btn btn-primary" disabled={isSubmitting}>
+        {errors.general && (
+          <div className="alert alert-danger">{errors.general}</div>
+        )}
+        <button
+          type="submit"
+          className="btn btn-primary"
+          disabled={isSubmitting}
+        >
           Login
         </button>
       </form>

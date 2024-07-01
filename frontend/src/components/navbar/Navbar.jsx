@@ -1,12 +1,15 @@
 import React, { useState, useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { Link } from 'react-router-dom';
 import { userLogout } from '../../axios/user';
 import { fetchUserData, selectUser } from '../../store/slices/userSlice';
-import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 
 const Navbar = () => {
   const dispatch = useDispatch();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const user = useSelector(selectUser);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -14,20 +17,20 @@ const Navbar = () => {
     if (token) {
       dispatch(fetchUserData());
     }
-  }, [dispatch]);
+  }, [user, isLoggedIn, dispatch]);
 
   const handleLogout = (e) => {
     e.preventDefault();
     userLogout().then(() => {
       setIsLoggedIn(false);
-      // Optionally clear local storage or perform other logout actions
+      navigate('/');
     });
   };
 
   return (
     <nav className="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
       <div className="container">
-        <a className="navbar-brand" href="/">My Website</a>
+        <Link className="navbar-brand" to="/">My Website</Link>
         <button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
           <span className="navbar-toggler-icon"></span>
         </button>
@@ -36,16 +39,16 @@ const Navbar = () => {
             {isLoggedIn && (
               <>
                 <li className="nav-item">
-                  <a className="nav-link" href="/">Home</a>
+                  <Link className="nav-link" to="/">Home</Link>
                 </li>
                 <li className="nav-item">
-                  <a className="nav-link" href="/sources">Sources</a>
+                  <Link className="nav-link" to="/sources">Sources</Link>
                 </li>
                 <li className="nav-item">
-                  <a className="nav-link" href="/top-subscribed">Top subscribed</a>
+                  <Link className="nav-link" to="/top-subscribed">Top subscribed</Link>
                 </li>
                 <li className="nav-item">
-                  <a className="nav-link" href="/history">History</a>
+                  <Link className="nav-link" to="/history">History</Link>
                 </li>
               </>
             )}
@@ -54,17 +57,17 @@ const Navbar = () => {
             {!isLoggedIn && (
               <>
                 <li className="nav-item">
-                  <a className="nav-link" href="/login">Login</a>
+                  <Link className="nav-link" to="/login">Login</Link>
                 </li>
                 <li className="nav-item">
-                  <a className="nav-link" href="/register">Register</a>
+                  <Link className="nav-link" to="/register">Register</Link>
                 </li>
               </>
             )}
             {isLoggedIn && (
               <>
                 <li className="nav-item">
-                  <a className="nav-link" href="/" onClick={handleLogout}>Logout</a>
+                  <Link className="nav-link" to="/" onClick={handleLogout}>Logout</Link>
                 </li>
               </>
             )}

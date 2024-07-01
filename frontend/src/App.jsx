@@ -12,7 +12,7 @@ function App() {
   return (
     <>
       <Provider store={store}>
-        <div className="App" data-choose-theme>
+        <div className="App" >
           <RouterProvider router={router} />
         </div>
       </Provider>,

@@ -2,7 +2,7 @@ const Redis = require('ioredis');
 
 const redisClient = new Redis({
   host: process.env.REDIS_HOST || 'redis',
-  port: process.env.REDIS_PORT ? parseInt(process.env.REDIS_PORT) : 6379,
+  port: process.env.REDIS_PORT ? parseInt(process.env.REDIS_PORT, 10) : 6379,
 });
 
 redisClient.on('error', (err) => {

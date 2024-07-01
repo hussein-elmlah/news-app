@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { userRegister } from '../../axios/user';
+import { useNavigate } from "react-router-dom";
 
 const Register = () => {
   const [formValues, setFormValues] = useState({
@@ -11,6 +12,7 @@ const Register = () => {
 
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const navigate = useNavigate();
 
   const validate = (values) => {
     const errors = {};
@@ -23,7 +25,7 @@ const Register = () => {
 
     if (!values.email.trim()) {
       errors.email = 'Email is required';
-    } else if (!/\S+@\S+\.\S+/.test(values.email)) {
+    } else if (!/^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/.test(values.email)) {
       errors.email = 'Email is invalid';
     }
 
@@ -59,7 +61,7 @@ const Register = () => {
       setIsSubmitting(true);
       userRegister(formValues)
         .then(() => {
-          window.location.href = '/';
+          navigate('/');
         })
         .catch((error) => {
           if (error.response && error.response.status === 409) {

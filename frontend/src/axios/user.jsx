@@ -15,7 +15,6 @@ export const userLogout = (e) => {
   return axiosInstance.post("/users/logout")
     .then(() => {
       localStorage.removeItem("token");
-      window.location.href = "/";
     })
     .catch((error) => {
       console.error("Logout failed:", error);

@@ -43,7 +43,7 @@ const AllSourcesPage = () => {
       {sourcesStatus === 'succeeded' && (
         <div>
           <div className="row">
-            {sources.map((source) => (
+            {sources?.map((source) => (
               <div key={source.id} className="col-lg-4 col-md-6 mb-4">
                 <SourceCard source={source} />
               </div>

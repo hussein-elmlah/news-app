@@ -44,13 +44,13 @@ const SubscribedArticlesPage = () => {
 
       {articlesStatus === 'succeeded' && (
         <div>
-          <div className="row">
-            {subscribedArticles.map((article, index) => (
-              <div key={`key${index}`} className="col-lg-4 col-md-6 mb-4">
-                <ArticleCard article={article} />
-              </div>
-            ))}
-          </div>
+            <div className="row">
+              {subscribedArticles?.map((article, index) => (
+                <div key={`key${index}`} className="col-lg-4 col-md-6 mb-4">
+                  <ArticleCard article={article} />
+                </div>
+              ))}
+            </div>
           <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={handlePageChange} />
         </div>
       )}

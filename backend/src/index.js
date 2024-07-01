@@ -60,20 +60,20 @@ const server = app.listen(PORT, () => {
 function shutdown() {
   server.close((err) => {
     if (err) {
-      console.error('Error closing server:', err);
+      logger.error(`Error closing server: ${err}`);
       process.exit(1);
     }
-    console.log('Server closed gracefully');
+    logger.info('Server closed gracefully');
     process.exit(0);
   });
 }
 
 process.on('SIGINT', () => {
-  console.log('Received SIGINT signal. Closing server gracefully...');
+  logger.info('Received SIGINT signal. Closing server gracefully...');
   shutdown();
 });
 
 process.on('SIGTERM', () => {
-  console.log('Received SIGTERM signal. Closing server gracefully...');
+  logger.info('Received SIGTERM signal. Closing server gracefully...');
   shutdown();
 });
